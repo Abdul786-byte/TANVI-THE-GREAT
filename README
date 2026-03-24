@@ -1,0 +1,84 @@
+README: EventFlex — Build Your Event, Your Way
+Project Description
+EventFlex is a modern, all-in-one event management platform specifically engineered for student organizers. Unlike rigid, corporate-focused tools, EventFlex provides a "flex-first" architecture that allows organizers to define their own rules, pricing logic, and participant workflows. From hackathons to cultural fests, it transforms complex logistics into a streamlined, high-performance digital experience.
+
+ Problem Statement (TGPDS-06)
+Students organizing events like hackathons face significant hurdles due to the lack of flexible platforms. Existing industry-standard tools are often built for massive organizations, offering limited control over niche pricing structures, personalized eligibility rules, and internal event flows.
+
+EventFlex addresses this by providing a fully customizable hub where students independently control every aspect of their event—including custom registration fees, granular eligibility logic, and seamless planning—all within one efficient, data-driven dashboard.
+
+ Features and Functionality
+1. Event Creation Wizard
+4-Step Guided Setup: Easily configure basic details, rules, pricing, and review before going live.
+
+Real-Time Live Preview: See exactly how the event card and registration page will look to participants as you type.
+
+2. Dynamic Rules Engine
+Custom Eligibility: Set rules for team sizes (e.g., 2–4 members), year of study, and college-specific email verification.
+
+Logic Management: Add or remove rules like CGPA filters, round counts, and submission requirements on the fly.
+
+3. Flexible Pricing Models
+Tiered Pricing: Support for Free entry, Paid flat fees, or "Early Bird" tiered structures.
+
+Coupon System: Toggle-based discount management to boost early registrations.
+
+4. Admin Control Tower
+Live Analytics: Track total registrations, revenue, and conversion rates via interactive SVG charts.
+
+Participant Management: Filter and manage registrations with a detailed status-tracking table (Confirmed, Pending, Cancelled).
+
+5. AI Co-Pilot
+Automated Content: Generate compelling event descriptions using AI based on a few keywords.
+
+Conflict Detection: An intelligent assistant that reviews your rules to find contradictions or impossible conditions.
+
+6. Participant & Public Portals
+Personal Dashboard: Attendees can track their registered events, payment status, and activity timelines.
+
+Optimized Landing Pages: Public-facing pages designed for high conversion with trust badges and sticky registration cards.
+
+Tech Stack Used
+Frontend: Vanilla HTML5 & CSS3 (Advanced Flexbox/Grid layouts).
+
+Design System: Custom CSS Variables (Tokens) for consistent branding and "Glassmorphic" UI elements.
+
+Interactivity: Vanilla JavaScript (ES6+) for state management and screen switching.
+
+Typography: Plus Jakarta Sans (Headings/Body) and JetBrains Mono (Technical Data).
+
+Visuals: Inline SVG for dynamic charts and custom animations.
+
+ Setup and Installation
+EventFlex is currently a Single Page Application (SPA) prototype and does not require a local server or build tools.
+
+Clone the Repository:
+
+Bash
+git clone https://github.com/Abdul786-byte/TANVI-THE-GREAT
+Run the Project:
+
+Navigate to the project folder.
+
+Open eventflex_ui.html in any modern web browser (Chrome, Brave, Edge, or Safari).
+
+No Dependencies: There is no need for npm install as the project uses pure vanilla technologies.
+
+ Team Details
+College: Wainganga College of Engineering and Management
+
+Abdul Wadood – Project Lead & Developer
+Piyush Thool – Teammate
+Tanvi Giri – Teammate
+Arpit Sable – Teammate
+
+ Future Scope
+Backend Integration: Implementing Firebase or Node.js for persistent data storage and user authentication.
+
+Payment Gateway: Full integration with Razorpay or Stripe for automated fee collection.
+
+QR Check-in System: Generating unique QR codes on tickets for seamless offline event check-ins.
+
+Automated Certificates: One-click certificate generation and distribution for participants.
+
+In-App Messaging: Real-time chat for team collaboration and organizer-to-participant announcements.

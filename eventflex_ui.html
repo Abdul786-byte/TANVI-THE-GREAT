@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventFlex — Build Your Event, Your Way</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --bg:          #FAFAF7;
+  --surface:     #FFFFFF;
+  --surface2:    #F5F5F0;
+  --border:      #E8E8E0;
+  --border-soft: #F0F0EB;
+  --text:        #111110;
+  --text2:       #52524F;
+  --text3:       #A8A89E;
+  --indigo:      #6366F1;
+  --violet:      #8B5CF6;
+  --indigo-soft: rgba(99,102,241,0.08);
+  --indigo-mid:  rgba(99,102,241,0.15);
+  --grad:        linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  --grad-soft:   linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.12) 100%);
+  --shadow-xs:   0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  --shadow-md:   0 4px 16px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-lg:   0 12px 40px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-glow: 0 0 0 3px rgba(99,102,241,0.18);
+  --r-sm:        8px;
+  --r:           12px;
+  --r-lg:        16px;
+  --r-xl:        20px;
+  --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+
+/* ─── SCREEN SYSTEM ──────────────────────────────────────── */
+.screen{display:none;animation:screenIn 0.32s var(--ease);}
+.screen.active{display:block;}
+@keyframes screenIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ─── GLOBAL NAV ─────────────────────────────────────────── */
+.global-nav{
+  position:fixed;top:0;left:0;right:0;z-index:999;
+  background:rgba(250,250,247,0.88);
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid var(--border);
+  height:56px;
+  display:flex;align-items:center;
+  padding:0 24px;gap:0;
+}
+.nav-logo{
+  font-size:16px;font-weight:800;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-right:32px;flex-shrink:0;cursor:pointer;letter-spacing:-0.02em;
+}
+.nav-links{display:flex;gap:2px;flex:1;}
+.nav-link{
+  padding:6px 12px;border-radius:var(--r-sm);
+  font-size:13px;font-weight:500;color:var(--text2);
+  cursor:pointer;border:none;background:none;
+  transition:all 0.18s var(--ease);white-space:nowrap;
+}
+.nav-link:hover{color:var(--text);background:var(--surface2);}
+.nav-link.active{color:var(--indigo);background:var(--indigo-soft);}
+.nav-spacer{flex:1;}
+.nav-actions{display:flex;gap:8px;align-items:center;}
+.btn-ghost{
+  padding:7px 16px;border-radius:var(--r-sm);
+  font-size:13px;font-weight:600;color:var(--text2);
+  cursor:pointer;border:1px solid var(--border);background:var(--surface);
+  transition:all 0.18s var(--ease);
+}
+.btn-ghost:hover{border-color:var(--indigo);color:var(--indigo);}
+.btn-primary{
+  padding:7px 18px;border-radius:var(--r-sm);
+  font-size:13px;font-weight:600;color:#fff;
+  cursor:pointer;border:none;background:var(--grad);
+  transition:all 0.2s var(--ease);
+  box-shadow:0 2px 8px rgba(99,102,241,0.3);
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(99,102,241,0.4);}
+.btn-primary:active{transform:translateY(0);}
+
+/* ─── MAIN WRAP ──────────────────────────────────────────── */
+.main{padding-top:56px;}
+
+
+/* ══════════════════════════════════════════════════════════
+   SCREEN 1 — HERO LANDING
+══════════════════════════════════════════════════════════ */
+.hero-wrap{
+  min-height:calc(100vh - 56px);
+  display:flex;flex-direction:column;
+  overflow:hidden;position:relative;
+}
+/* ambient glow blobs */
+.hero-blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;}
+.blob-1{width:500px;height:500px;background:rgba(99,102,241,0.12);top:-100px;left:-80px;}
+.blob-2{width:400px;height:400px;background:rgba(139,92,246,0.1);top:80px;right:-60px;}
+.blob-3{width:300px;height:300px;background:rgba(99,102,241,0.07);bottom:40px;left:30%;}
+
+.hero-inner{
+  flex:1;display:grid;grid-template-columns:1fr 1fr;
+  gap:60px;align-items:center;
+  max-width:1160px;margin:0 auto;
+  padding:72px 32px 64px;
+  position:relative;z-index:2;
+}
+.hero-left{}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:5px 12px;border-radius:20px;
+  background:var(--indigo-soft);border:1px solid var(--indigo-mid);
+  font-size:12px;font-weight:600;color:var(--indigo);
+  margin-bottom:24px;letter-spacing:0.02em;
+}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--indigo);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.8);}}
+.hero-h1{
+  font-size:clamp(40px,5.5vw,64px);font-weight:800;
+  line-height:1.08;letter-spacing:-0.03em;
+  color:var(--text);margin-bottom:20px;
+}
+.hero-h1 .grad-text{
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-sub{
+  font-size:17px;font-weight:400;color:var(--text2);
+  line-height:1.7;max-width:420px;margin-bottom:36px;
+}
+.hero-ctas{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.btn-hero-primary{
+  padding:13px 28px;border-radius:var(--r);
+  font-family:var(--font);font-size:15px;font-weight:700;color:#fff;
+  cursor:pointer;border:none;background:var(--grad);
+  box-shadow:0 4px 20px rgba(99,102,241,0.35);
+  transition:all 0.22s var(--ease);
+  display:flex;align-items:center;gap:8px;
+}
+.btn-hero-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(99,102,241,0.45);}
+.btn-hero-secondary{
+  padding:13px 28px;border-radius:var(--r);
+  font-family:var(--font);font-size:15px;font-weight:600;color:var(--text);
+  cursor:pointer;border:1.5px solid var(--border);background:var(--surface);
+  transition:all 0.2s var(--ease);
+}
+.btn-hero-secondary:hover{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-soft);}
+.hero-social-proof{
+  margin-top:36px;display:flex;align-items:center;gap:12px;
+}
+.avatar-stack{display:flex;}
+.avatar-stack .av{
+  width:30px;height:30px;border-radius:50%;border:2px solid var(--bg);
+  background:var(--grad);font-size:11px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  margin-left:-8px;
+}
+.avatar-stack .av:first-child{margin-left:0;}
+.av-a{background:linear-gradient(135deg,#6366F1,#8B5CF6)!important;}
+.av-b{background:linear-gradient(135deg,#EC4899,#F97316)!important;}
+.av-c{background:linear-gradient(135deg,#14B8A6,#06B6D4)!important;}
+.av-d{background:linear-gradient(135deg,#F59E0B,#EF4444)!important;}
+.proof-text{font-size:13px;color:var(--text2);font-weight:500;}
+.proof-text strong{color:var(--text);}
+
+/* ── HERO DASHBOARD MOCK ─────── */
+.hero-right{position:relative;display:flex;justify-content:center;}
+.dash-mock{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-xl);
+  padding:20px;
+  box-shadow:var(--shadow-lg);
+  width:100%;max-width:480px;
+  position:relative;
+  animation:floatMock 6s ease-in-out infinite;
+}
+@keyframes floatMock{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.mock-topbar{
+  display:flex;align-items:center;gap:8px;margin-bottom:16px;
+  padding-bottom:14px;border-bottom:1px solid var(--border);
+}
+.mock-dot{width:8px;height:8px;border-radius:50%;}
+.mock-title{font-size:13px;font-weight:600;color:var(--text);flex:1;}
+.mock-badge{
+  font-size:11px;font-weight:600;color:#22C55E;
+  background:rgba(34,197,94,0.1);padding:3px 8px;border-radius:20px;
+}
+.mock-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.mock-stat{
+  background:var(--bg);border-radius:var(--r-sm);padding:12px;
+  border:1px solid var(--border-soft);
+}
+.mock-stat-val{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-0.03em;line-height:1;}
+.mock-stat-lbl{font-size:10px;color:var(--text3);margin-top:4px;font-weight:500;}
+.mock-chart{
+  background:var(--bg);border-radius:var(--r-sm);padding:14px;
+  border:1px solid var(--border-soft);margin-bottom:12px;
+}
+.mock-chart-title{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:12px;}
+.chart-bars{display:flex;align-items:flex-end;gap:5px;height:70px;}
+.bar{
+  flex:1;border-radius:3px 3px 0 0;
+  background:var(--grad-soft);
+  transition:height 0.5s var(--ease);
+  position:relative;cursor:pointer;
+}
+.bar:hover{opacity:0.8;}
+.bar.highlight{background:var(--grad);}
+.mock-event-list{display:flex;flex-direction:column;gap:8px;}
+.mock-event{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;
+  background:var(--bg);border-radius:var(--r-sm);
+  border:1px solid var(--border-soft);
+}
+.mock-event-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.mock-event-name{font-size:12px;font-weight:600;color:var(--text);flex:1;}
+.mock-event-count{font-size:11px;font-weight:600;color:var(--indigo);}
+.mock-event-status{
+  font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;
+}
+.status-live{background:rgba(34,197,94,0.12);color:#16A34A;}
+.status-draft{background:rgba(251,191,36,0.15);color:#D97706;}
+
+/* floating mini-cards */
+.float-card{
+  position:absolute;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:12px 16px;
+  box-shadow:var(--shadow-md);
+  display:flex;align-items:center;gap:10px;
+  font-size:12px;font-weight:600;
+  white-space:nowrap;
+  animation:floatCard 5s ease-in-out infinite;
+}
+.fc-1{bottom:-20px;left:-40px;animation-delay:0.5s;}
+.fc-2{top:30px;right:-50px;animation-delay:1.5s;}
+.fc-3{top:-18px;left:20px;animation-delay:2.5s;}
+@keyframes floatCard{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-6px) rotate(1deg);}}
+.fc-icon{font-size:18px;}
+.fc-val{font-size:18px;font-weight:800;color:var(--text);}
+.fc-sub{font-size:11px;color:var(--text3);font-weight:500;}
+
+/* features strip */
+.hero-features{
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:24px 32px;position:relative;z-index:2;
+}
+.features-inner{
+  max-width:1160px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+}
+.feature-item{
+  display:flex;align-items:center;gap:12px;padding:12px 24px;
+  border-right:1px solid var(--border);
+}
+.feature-item:first-child{padding-left:0;}
+.feature-item:last-child{border-right:none;}
+.fi-icon{
+  width:36px;height:36px;border-radius:var(--r-sm);
+  background:var(--indigo-soft);display:flex;align-items:center;
+  justify-content:center;font-size:16px;flex-shrink:0;
+}
+.fi-title{font-size:13px;font-weight:700;color:var(--text);}
+.fi-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+
+
+/* ══════════════════════════════════════════════════════════
+   SCREEN 2 — EVENT CREATION WIZARD
+══════════════════════════════════════════════════════════ */
+.wizard-wrap{min-height:calc(100vh - 56px);display:grid;grid-template-columns:1fr 1fr;}
+.wizard-left{
+  padding:48px 40px;
+  border-right:1px solid var(--border);
+  overflow-y:auto;max-height:calc(100vh - 56px);
+}
+.wizard-right{
+  padding:40px;
+  background:var(--surface2);
+  overflow-y:auto;max-height:calc(100vh - 56px);
+}
+.wiz-header{margin-bottom:36px;}
+.wiz-back{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:500;color:var(--text3);
+  cursor:pointer;margin-bottom:20px;
+  transition:color 0.15s;border:none;background:none;
+}
+.wiz-back:hover{color:var(--text);}
+.wiz-title{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-0.02em;margin-bottom:6px;}
+.wiz-sub{font-size:14px;color:var(--text2);}
+
+/* stepper */
+.stepper{display:flex;align-items:center;gap:0;margin-bottom:36px;}
+.step-item{
+  display:flex;align-items:center;gap:10px;flex:1;
+  cursor:pointer;position:relative;
+}
+.step-item:not(:last-child)::after{
+  content:'';position:absolute;left:calc(50% + 14px);
+  top:14px;width:calc(100% - 28px);height:1px;
+  background:var(--border);z-index:0;
+}
+.step-item.completed::after{background:var(--indigo);}
+.step-num{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;
+  border:2px solid var(--border);color:var(--text3);
+  background:var(--bg);z-index:1;flex-shrink:0;
+  transition:all 0.2s;
+}
+.step-item.active .step-num{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 2px 8px rgba(99,102,241,0.4);}
+.step-item.completed .step-num{background:var(--grad);border-color:transparent;color:#fff;}
+.step-label{font-size:11px;font-weight:600;color:var(--text3);display:none;}
+
+/* form elements */
+.form-group{margin-bottom:22px;}
+.form-label{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:var(--text);margin-bottom:7px;}
+.form-input{
+  width:100%;padding:10px 14px;
+  border:1.5px solid var(--border);border-radius:var(--r-sm);
+  font-family:var(--font);font-size:14px;color:var(--text);
+  background:var(--surface);
+  transition:all 0.18s var(--ease);outline:none;
+}
+.form-input:focus{border-color:var(--indigo);box-shadow:var(--shadow-glow);}
+.form-input::placeholder{color:var(--text3);}
+textarea.form-input{resize:vertical;min-height:90px;}
+
+.ai-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:6px;
+  background:var(--indigo-soft);border:1px solid var(--indigo-mid);
+  font-size:11px;font-weight:600;color:var(--indigo);
+  cursor:pointer;transition:all 0.15s;
+}
+.ai-btn:hover{background:var(--indigo-mid);}
+
+/* rule chips */
+.rules-zone{
+  min-height:100px;
+  border:1.5px dashed var(--border);border-radius:var(--r);
+  padding:14px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;
+  background:var(--bg);margin-bottom:14px;transition:border-color 0.2s;
+}
+.rules-zone:hover{border-color:var(--indigo);}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:20px;
+  font-size:12px;font-weight:600;
+  transition:all 0.15s;cursor:default;
+}
+.chip-indigo{background:var(--indigo-soft);border:1px solid var(--indigo-mid);color:var(--indigo);}
+.chip-violet{background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);color:#7C3AED;}
+.chip-teal{background:rgba(20,184,166,0.08);border:1px solid rgba(20,184,166,0.2);color:#0D9488;}
+.chip-amber{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#D97706;}
+.chip-remove{
+  background:none;border:none;cursor:pointer;
+  font-size:14px;color:inherit;opacity:0.6;padding:0;line-height:1;
+}
+.chip-remove:hover{opacity:1;}
+.add-rule-btn{
+  padding:8px 16px;border-radius:var(--r-sm);
+  font-size:13px;font-weight:600;color:var(--indigo);
+  border:1.5px dashed var(--indigo-mid);background:var(--indigo-soft);
+  cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  transition:all 0.15s;
+}
+.add-rule-btn:hover{background:var(--indigo-mid);}
+
+/* toggle */
+.toggle-row{display:flex;align-items:center;gap:12px;}
+.toggle{
+  width:44px;height:24px;border-radius:12px;background:var(--border);
+  position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;
+  border:none;
+}
+.toggle.on{background:var(--grad);}
+.toggle::after{
+  content:'';width:18px;height:18px;border-radius:50%;background:#fff;
+  position:absolute;top:3px;left:3px;transition:left 0.2s;
+  box-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle.on::after{left:23px;}
+.toggle-label{font-size:14px;font-weight:500;color:var(--text);}
+
+/* pricing segment */
+.pricing-seg{
+  display:flex;border:1.5px solid var(--border);border-radius:var(--r-sm);
+  overflow:hidden;margin-bottom:18px;
+}
+.seg-btn{
+  flex:1;padding:9px;text-align:center;
+  font-family:var(--font);font-size:13px;font-weight:600;
+  cursor:pointer;border:none;background:none;color:var(--text2);
+  transition:all 0.18s;
+}
+.seg-btn.active{background:var(--grad);color:#fff;}
+
+/* wizard nav btns */
+.wiz-footer{display:flex;justify-content:space-between;align-items:center;margin-top:28px;padding-top:24px;border-top:1px solid var(--border);}
+.wiz-prev{padding:10px 20px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--surface);font-family:var(--font);font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;transition:all 0.15s;}
+.wiz-prev:hover{border-color:var(--text);color:var(--text);}
+.wiz-next{padding:10px 24px;border-radius:var(--r-sm);background:var(--grad);border:none;font-family:var(--font);font-size:14px;font-weight:700;color:#fff;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 10px rgba(99,102,241,0.3);display:flex;align-items:center;gap:8px;}
+.wiz-next:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(99,102,241,0.4);}
+
+/* live preview */
+.preview-box{position:sticky;top:24px;}
+.preview-label{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.preview-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.preview-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-md);
+}
+.preview-banner{
+  height:120px;
+  background:var(--grad);
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.preview-banner-pattern{
+  position:absolute;inset:0;opacity:0.15;
+  background-image:radial-gradient(circle at 20% 50%, white 1px, transparent 1px),
+                   radial-gradient(circle at 80% 20%, white 1px, transparent 1px);
+  background-size:40px 40px;
+}
+.preview-body{padding:20px;}
+.preview-event-name{font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-0.02em;}
+.preview-event-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px;}
+.preview-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+.preview-price-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:16px;border-top:1px solid var(--border);
+}
+.preview-price{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.03em;}
+.preview-price span{font-size:12px;color:var(--text3);font-weight:500;}
+.preview-reg-btn{
+  padding:9px 20px;border-radius:var(--r-sm);
+  background:var(--grad);color:#fff;font-size:13px;font-weight:700;
+  border:none;cursor:pointer;
+  box-shadow:0 2px 8px rgba(99,102,241,0.3);
+}
+
+/* step content sections */
+.step-content{display:none;}
+.step-content.active{display:block;}
+
+
+/* ══════════════════════════════════════════════════════════
+   SCREEN 3 — ADMIN DASHBOARD
+══════════════════════════════════════════════════════════ */
+.dash-wrap{max-width:1160px;margin:0 auto;padding:36px 32px;}
+.dash-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:32px;flex-wrap:wrap;gap:16px;
+}
+.dash-title-row{}
+.dash-greeting{font-size:13px;color:var(--text3);font-weight:500;margin-bottom:4px;}
+.dash-h1{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-0.02em;}
+.dash-actions{display:flex;gap:8px;align-items:center;}
+.filter-btn{
+  padding:8px 16px;border-radius:var(--r-sm);
+  border:1.5px solid var(--border);background:var(--surface);
+  font-family:var(--font);font-size:13px;font-weight:600;color:var(--text2);
+  cursor:pointer;display:flex;align-items:center;gap:6px;
+  transition:all 0.15s;
+}
+.filter-btn:hover{border-color:var(--indigo);color:var(--indigo);}
+.export-btn{
+  padding:8px 16px;border-radius:var(--r-sm);
+  border:none;background:var(--surface);
+  border:1.5px solid var(--border);
+  font-family:var(--font);font-size:13px;font-weight:600;color:var(--text2);
+  cursor:pointer;display:flex;align-items:center;gap:6px;
+  transition:all 0.15s;
+}
+.export-btn:hover{border-color:var(--indigo);color:var(--indigo);}
+
+/* KPI cards */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.kpi-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:20px 22px;
+  transition:transform 0.2s,box-shadow 0.2s;
+  cursor:default;
+}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+.kpi-icon{font-size:20px;margin-bottom:12px;}
+.kpi-val{font-size:30px;font-weight:800;color:var(--text);letter-spacing:-0.03em;line-height:1;}
+.kpi-label{font-size:12px;color:var(--text3);font-weight:500;margin-top:4px;}
+.kpi-change{
+  margin-top:10px;font-size:12px;font-weight:600;
+  display:flex;align-items:center;gap:4px;
+}
+.kpi-up{color:#16A34A;background:rgba(34,197,94,0.1);padding:2px 7px;border-radius:10px;}
+.kpi-down{color:#DC2626;background:rgba(239,68,68,0.1);padding:2px 7px;border-radius:10px;}
+
+/* charts grid */
+.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:28px;}
+.chart-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:22px;
+}
+.cc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.cc-title{font-size:15px;font-weight:700;color:var(--text);}
+.cc-sub{font-size:12px;color:var(--text3);}
+.cc-period{
+  display:flex;border:1.5px solid var(--border);border-radius:var(--r-sm);overflow:hidden;
+}
+.period-btn{
+  padding:5px 12px;font-family:var(--font);font-size:11px;font-weight:600;
+  cursor:pointer;border:none;background:none;color:var(--text3);
+  transition:all 0.15s;
+}
+.period-btn.active{background:var(--grad);color:#fff;}
+
+/* SVG chart */
+.svg-chart{width:100%;height:160px;display:block;}
+.chart-area{fill:url(#areaGrad);opacity:0.3;}
+.chart-line{fill:none;stroke:url(#lineGrad);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.chart-dot{fill:#fff;stroke:var(--indigo);stroke-width:2.5;}
+
+/* donut */
+.donut-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0;}
+.donut-legend{width:100%;margin-top:16px;display:flex;flex-direction:column;gap:8px;}
+.leg-item{display:flex;align-items:center;justify-content:space-between;font-size:12px;}
+.leg-dot{width:8px;height:8px;border-radius:50%;margin-right:8px;flex-shrink:0;}
+.leg-name{color:var(--text2);font-weight:500;flex:1;}
+.leg-val{font-weight:700;color:var(--text);}
+
+/* participant table */
+.table-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);overflow:hidden;
+}
+.table-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px;border-bottom:1px solid var(--border);
+}
+.table-title{font-size:15px;font-weight:700;color:var(--text);}
+.table-search{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 14px;border-radius:var(--r-sm);
+  border:1.5px solid var(--border);background:var(--bg);
+  font-size:13px;color:var(--text2);
+}
+.table-search input{
+  border:none;background:none;outline:none;
+  font-family:var(--font);font-size:13px;color:var(--text);
+  width:160px;
+}
+.ptable{width:100%;border-collapse:collapse;}
+.ptable th{
+  padding:11px 22px;text-align:left;
+  font-size:11px;font-weight:700;color:var(--text3);
+  letter-spacing:0.05em;text-transform:uppercase;
+  background:var(--bg);border-bottom:1px solid var(--border);
+}
+.ptable td{
+  padding:13px 22px;font-size:13px;color:var(--text);
+  border-bottom:1px solid var(--border-soft);
+  vertical-align:middle;
+}
+.ptable tr:last-child td{border-bottom:none;}
+.ptable tbody tr{transition:background 0.12s;}
+.ptable tbody tr:hover td{background:var(--bg);}
+.td-avatar{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;margin-right:10px;flex-shrink:0;
+}
+.td-name-wrap{display:flex;align-items:center;}
+.td-name{font-weight:600;color:var(--text);}
+.td-email{font-size:11px;color:var(--text3);}
+.status-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;
+}
+.s-confirmed{background:rgba(34,197,94,0.1);color:#16A34A;}
+.s-pending{background:rgba(251,191,36,0.12);color:#D97706;}
+.s-cancelled{background:rgba(239,68,68,0.1);color:#DC2626;}
+.s-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+
+
+/* ══════════════════════════════════════════════════════════
+   SCREEN 4 — PARTICIPANT DASHBOARD
+══════════════════════════════════════════════════════════ */
+.part-wrap{max-width:960px;margin:0 auto;padding:40px 32px;}
+.part-header{
+  display:flex;align-items:center;gap:16px;
+  margin-bottom:36px;padding:20px 24px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);
+}
+.part-avatar{
+  width:52px;height:52px;border-radius:50%;
+  background:var(--grad);display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:800;color:#fff;flex-shrink:0;
+}
+.part-name{font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.02em;}
+.part-meta{font-size:13px;color:var(--text3);margin-top:2px;}
+.part-stats{margin-left:auto;display:flex;gap:24px;}
+.ps-item{text-align:center;}
+.ps-val{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-0.03em;}
+.ps-lbl{font-size:11px;color:var(--text3);font-weight:500;}
+.section-head{font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px;}
+.events-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:32px;}
+.event-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);overflow:hidden;
+  transition:transform 0.2s,box-shadow 0.2s;cursor:default;
+}
+.event-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);}
+.ec-banner{height:80px;position:relative;overflow:hidden;}
+.ec-status-badge{
+  position:absolute;top:10px;right:10px;
+  padding:3px 9px;border-radius:10px;font-size:10px;font-weight:700;
+}
+.ec-body{padding:16px;}
+.ec-cat{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--indigo);margin-bottom:6px;}
+.ec-name{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.01em;margin-bottom:8px;}
+.ec-date{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:5px;margin-bottom:14px;}
+.ec-actions{display:flex;gap:8px;}
+.ec-btn{
+  flex:1;padding:8px;border-radius:var(--r-sm);
+  font-family:var(--font);font-size:12px;font-weight:600;
+  cursor:pointer;border:1.5px solid var(--border);background:none;color:var(--text2);
+  transition:all 0.15s;text-align:center;
+}
+.ec-btn:hover{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-soft);}
+.ec-btn-primary{background:var(--grad);border-color:transparent;color:#fff;}
+.ec-btn-primary:hover{opacity:0.9;color:#fff;}
+
+/* timeline */
+.timeline{display:flex;flex-direction:column;gap:0;}
+.tl-item{display:flex;gap:16px;position:relative;padding-bottom:24px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-item:not(:last-child)::before{
+  content:'';position:absolute;left:15px;top:32px;bottom:0;width:1px;background:var(--border);
+}
+.tl-dot{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:14px;border:2px solid var(--border);
+  background:var(--surface);z-index:1;
+}
+.tl-dot.done{border-color:var(--indigo);background:var(--indigo-soft);}
+.tl-content{flex:1;padding-top:4px;}
+.tl-event{font-size:14px;font-weight:600;color:var(--text);}
+.tl-time{font-size:12px;color:var(--text3);margin-top:2px;}
+
+
+/* ══════════════════════════════════════════════════════════
+   SCREEN 5 — PUBLIC EVENT PAGE
+══════════════════════════════════════════════════════════ */
+.public-wrap{max-width:860px;margin:0 auto;padding:40px 32px;}
+.pub-banner{
+  height:240px;border-radius:var(--r-xl);
+  background:var(--grad);
+  position:relative;overflow:hidden;margin-bottom:28px;
+  display:flex;align-items:center;justify-content:center;
+}
+.pub-banner-text{
+  position:relative;z-index:2;text-align:center;color:#fff;
+}
+.pub-banner-title{font-size:36px;font-weight:800;letter-spacing:-0.03em;text-shadow:0 2px 20px rgba(0,0,0,0.2);}
+.pub-banner-sub{font-size:15px;opacity:0.85;margin-top:6px;}
+.pub-body{display:grid;grid-template-columns:1fr 300px;gap:28px;}
+.pub-left{}
+.pub-section{margin-bottom:28px;}
+.pub-section-title{
+  font-size:14px;font-weight:700;color:var(--text);
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;
+  cursor:pointer;
+}
+.pub-section-title::after{content:'▾';font-size:12px;color:var(--text3);margin-left:auto;}
+.pub-desc{font-size:14px;color:var(--text2);line-height:1.8;}
+.rules-list{display:flex;flex-direction:column;gap:10px;}
+.rule-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 14px;
+  background:var(--bg);border-radius:var(--r-sm);border:1px solid var(--border);
+}
+.rule-icon{font-size:16px;flex-shrink:0;}
+.rule-text{font-size:13px;color:var(--text2);}
+.rule-text strong{color:var(--text);}
+
+/* pub right sticky card */
+.pub-reg-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:22px;position:sticky;top:80px;
+  box-shadow:var(--shadow-md);
+}
+.pub-reg-price{font-size:32px;font-weight:800;color:var(--text);letter-spacing:-0.04em;}
+.pub-reg-price sup{font-size:16px;font-weight:600;color:var(--text3);}
+.pub-reg-tier{font-size:12px;color:#D97706;font-weight:600;background:rgba(245,158,11,0.1);padding:3px 8px;border-radius:8px;display:inline-block;margin-top:4px;}
+.pub-reg-btn{
+  width:100%;padding:13px;border-radius:var(--r);
+  background:var(--grad);border:none;color:#fff;
+  font-family:var(--font);font-size:15px;font-weight:700;
+  cursor:pointer;margin:16px 0;
+  box-shadow:0 4px 16px rgba(99,102,241,0.3);
+  transition:all 0.2s;
+}
+.pub-reg-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(99,102,241,0.4);}
+.pub-trust{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  font-size:13px;color:var(--text2);font-weight:500;
+  padding:10px;background:rgba(34,197,94,0.06);border-radius:var(--r-sm);
+  border:1px solid rgba(34,197,94,0.15);
+}
+.pub-details{margin-top:18px;display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--border);padding-top:18px;}
+.pub-detail{display:flex;align-items:center;gap:10px;font-size:13px;}
+.pd-icon{font-size:16px;flex-shrink:0;}
+.pd-label{color:var(--text3);font-weight:500;min-width:60px;}
+.pd-val{color:var(--text);font-weight:600;}
+
+
+/* ══════════════════════════════════════════════════════════
+   SCREEN 6 — AI CO-PILOT
+══════════════════════════════════════════════════════════ */
+.ai-wrap{
+  min-height:calc(100vh - 56px);display:grid;
+  grid-template-columns:1fr 380px;
+}
+.ai-context{
+  padding:48px 40px;
+  border-right:1px solid var(--border);
+}
+.ai-context-title{font-size:26px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px;}
+.ai-context-sub{font-size:14px;color:var(--text2);margin-bottom:32px;line-height:1.7;}
+.ai-feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:32px;}
+.aif-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:18px;
+  transition:transform 0.2s,box-shadow 0.2s;cursor:pointer;
+}
+.aif-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--indigo);}
+.aif-icon{font-size:22px;margin-bottom:10px;}
+.aif-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px;}
+.aif-desc{font-size:12px;color:var(--text3);line-height:1.6;}
+.quick-actions{display:flex;flex-wrap:wrap;gap:8px;}
+.qa-chip{
+  padding:8px 14px;border-radius:20px;
+  background:var(--bg);border:1.5px solid var(--border);
+  font-size:12px;font-weight:600;color:var(--text2);
+  cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:6px;
+}
+.qa-chip:hover{background:var(--indigo-soft);border-color:var(--indigo-mid);color:var(--indigo);}
+
+/* chat panel */
+.ai-panel{
+  background:var(--surface);display:flex;flex-direction:column;
+  position:relative;
+}
+.ai-panel-head{
+  padding:18px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.ai-avatar{
+  width:36px;height:36px;border-radius:var(--r-sm);
+  background:var(--grad);display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+}
+.ai-name{font-size:14px;font-weight:700;color:var(--text);}
+.ai-status{font-size:11px;color:#16A34A;font-weight:500;display:flex;align-items:center;gap:4px;}
+.ai-status-dot{width:6px;height:6px;border-radius:50%;background:#22C55E;animation:pulse 2s infinite;}
+.chat-msgs{
+  flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;
+  min-height:400px;max-height:calc(100vh - 260px);
+}
+.msg{display:flex;gap:10px;align-items:flex-end;max-width:92%;}
+.msg-ai{align-self:flex-start;}
+.msg-user{align-self:flex-end;flex-direction:row-reverse;}
+.msg-avatar{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+}
+.msg-ai .msg-avatar{background:var(--grad);color:#fff;font-weight:700;}
+.msg-user .msg-avatar{background:var(--surface2);font-size:14px;}
+.msg-bubble{
+  padding:10px 14px;border-radius:14px;
+  font-size:13px;line-height:1.6;
+}
+.msg-ai .msg-bubble{
+  background:var(--bg);border:1px solid var(--border);
+  color:var(--text);border-bottom-left-radius:4px;
+}
+.msg-user .msg-bubble{
+  background:var(--grad);color:#fff;
+  border-bottom-right-radius:4px;
+}
+.msg-time{font-size:10px;color:var(--text3);margin-top:4px;text-align:right;}
+.ai-suggestion{
+  margin-top:8px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px;font-size:12px;color:var(--text);
+  line-height:1.7;
+}
+.ai-suggestion-title{font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--indigo);margin-bottom:8px;}
+.chat-input-wrap{
+  padding:14px 16px;border-top:1px solid var(--border);
+  display:flex;gap:8px;align-items:flex-end;
+}
+.chat-input{
+  flex:1;padding:10px 14px;border-radius:var(--r);
+  border:1.5px solid var(--border);background:var(--bg);
+  font-family:var(--font);font-size:13px;color:var(--text);
+  outline:none;resize:none;max-height:100px;
+  transition:border-color 0.15s;line-height:1.5;
+}
+.chat-input:focus{border-color:var(--indigo);box-shadow:var(--shadow-glow);}
+.chat-send{
+  width:38px;height:38px;border-radius:var(--r-sm);
+  background:var(--grad);border:none;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:16px;transition:all 0.15s;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(99,102,241,0.3);
+}
+.chat-send:hover{transform:scale(1.05);}
+.typing-indicator{display:flex;gap:4px;padding:12px 14px;align-items:center;}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);animation:typing 1.2s infinite;}
+.typing-dot:nth-child(2){animation-delay:0.2s;}
+.typing-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes typing{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+
+
+/* ─── RESPONSIVE ─────────────────────────────────────────── */
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;padding:40px 20px;}
+  .hero-right{display:none;}
+  .wizard-wrap{grid-template-columns:1fr;}
+  .wizard-right{display:none;}
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .charts-grid{grid-template-columns:1fr;}
+  .pub-body{grid-template-columns:1fr;}
+  .ai-wrap{grid-template-columns:1fr;}
+  .ai-panel{display:none;}
+  .features-inner{grid-template-columns:1fr 1fr;}
+  .ai-feature-grid{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .features-inner{grid-template-columns:1fr;}
+  .dash-wrap,.part-wrap,.public-wrap,.ai-wrap>div{padding:24px 16px;}
+  .global-nav{padding:0 16px;}
+  .nav-links .nav-link{display:none;}
+  .nav-links .nav-link.mobile-show{display:block;}
+}
+
+/* ─── UTIL ───────────────────────────────────────────────── */
+.divider{height:1px;background:var(--border);margin:28px 0;}
+.text-indigo{color:var(--indigo);}
+.font-mono{font-family:var(--mono);font-size:12px;}
+.mt-4{margin-top:4px;} .mt-8{margin-top:8px;} .mt-12{margin-top:12px;}
+.mb-12{margin-bottom:12px;}
+.flex{display:flex;}.ai-center{align-items:center;}.gap-8{gap:8px;}
+.shrink{flex-shrink:0;}
+
+/* loading shimmer for ai typing */
+@keyframes shimmer{from{background-position:-200% 0;}to{background-position:200% 0;}}
+</style>
+</head>
+<body>
+
+<!-- ─── GLOBAL NAV ──────────────────────────────────────────── -->
+<nav class="global-nav">
+  <div class="nav-logo" onclick="showScreen('landing')">EventFlex</div>
+  <div class="nav-links">
+    <button class="nav-link mobile-show" onclick="showScreen('landing')">Features</button>
+    <button class="nav-link" onclick="showScreen('public-event')">Pricing</button>
+    <button class="nav-link" onclick="showScreen('ai-copilot')">AI Co-Pilot</button>
+  </div>
+  <div class="nav-spacer"></div>
+  <div class="nav-actions">
+    <button class="btn-ghost" onclick="showScreen('participant')">Log in</button>
+    <button class="btn-primary" onclick="showScreen('wizard')">Create Event</button>
+  </div>
+</nav>
+
+<div class="main">
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 1: HERO LANDING
+══════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-landing">
+  <div class="hero-wrap">
+    <div class="hero-blob blob-1"></div>
+    <div class="hero-blob blob-2"></div>
+    <div class="hero-blob blob-3"></div>
+
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="hero-eyebrow">
+          <span class="hero-eyebrow-dot"></span>
+          Now in public beta — free for students
+        </div>
+        <h1 class="hero-h1">
+          Build Your Event,<br>
+          <span class="grad-text">Your Way.</span>
+        </h1>
+        <p class="hero-sub">
+          The only event platform built for student organizers. Dynamic rules, AI co-pilot, instant analytics — everything in one place.
+        </p>
+        <div class="hero-ctas">
+          <button class="btn-hero-primary" onclick="showScreen('wizard')">
+            <span>✦</span> Create Event Free
+          </button>
+          <button class="btn-hero-secondary" onclick="showScreen('admin-dashboard')">
+            View Dashboard →
+          </button>
+        </div>
+        <div class="hero-social-proof">
+          <div class="avatar-stack">
+            <div class="av av-a">A</div>
+            <div class="av av-b">R</div>
+            <div class="av av-c">P</div>
+            <div class="av av-d">S</div>
+          </div>
+          <span class="proof-text">Trusted by <strong>4,200+ organizers</strong> across 80 colleges</span>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <!-- floating mini-cards -->
+        <div class="float-card fc-3">
+          <span class="fc-icon">⚡</span>
+          <div><div class="fc-val">2m 14s</div><div class="fc-sub">Avg. event created</div></div>
+        </div>
+        <div class="float-card fc-2">
+          <span class="fc-icon">💰</span>
+          <div><div class="fc-val">₹2.4L</div><div class="fc-sub">Revenue this month</div></div>
+        </div>
+        <div class="float-card fc-1">
+          <span class="fc-icon">🔥</span>
+          <div><div class="fc-val">1,247</div><div class="fc-sub">Registrations today</div></div>
+        </div>
+
+        <!-- dashboard mock -->
+        <div class="dash-mock">
+          <div class="mock-topbar">
+            <div class="mock-dot" style="background:#EF4444"></div>
+            <div class="mock-dot" style="background:#F59E0B"></div>
+            <div class="mock-dot" style="background:#22C55E"></div>
+            <span class="mock-title">EventFlex Dashboard</span>
+            <span class="mock-badge">● Live</span>
+          </div>
+
+          <div class="mock-stats">
+            <div class="mock-stat">
+              <div class="mock-stat-val">847</div>
+              <div class="mock-stat-lbl">Registrations</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-val" style="color:var(--indigo)">₹1.2L</div>
+              <div class="mock-stat-lbl">Revenue</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-val">74%</div>
+              <div class="mock-stat-lbl">Conversion</div>
+            </div>
+          </div>
+
+          <div class="mock-chart">
+            <div class="mock-chart-title">Registrations This Week</div>
+            <div class="chart-bars">
+              <div class="bar" style="height:40%"></div>
+              <div class="bar" style="height:55%"></div>
+              <div class="bar" style="height:35%"></div>
+              <div class="bar highlight" style="height:75%"></div>
+              <div class="bar highlight" style="height:90%"></div>
+              <div class="bar" style="height:65%"></div>
+              <div class="bar highlight" style="height:100%"></div>
+            </div>
+          </div>
+
+          <div class="mock-event-list">
+            <div class="mock-event">
+              <div class="mock-event-dot" style="background:#6366F1"></div>
+              <div class="mock-event-name">HackSphere 2025</div>
+              <div class="mock-event-count">412 regs</div>
+              <div class="mock-event-status status-live">Live</div>
+            </div>
+            <div class="mock-event">
+              <div class="mock-event-dot" style="background:#8B5CF6"></div>
+              <div class="mock-event-name">DevSprint Workshop</div>
+              <div class="mock-event-count">218 regs</div>
+              <div class="mock-event-status status-draft">Draft</div>
+            </div>
+            <div class="mock-event">
+              <div class="mock-event-dot" style="background:#22D3EE"></div>
+              <div class="mock-event-name">UI/UX Bootcamp</div>
+              <div class="mock-event-count">217 regs</div>
+              <div class="mock-event-status status-live">Live</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /hero-inner -->
+
+    <div class="hero-features">
+      <div class="features-inner">
+        <div class="feature-item">
+          <div class="fi-icon">⚙️</div>
+          <div><div class="fi-title">Dynamic Rule Engine</div><div class="fi-sub">Custom eligibility & pricing logic</div></div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-icon">🤖</div>
+          <div><div class="fi-title">AI Co-Pilot</div><div class="fi-sub">Generate descriptions, detect conflicts</div></div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-icon">📊</div>
+          <div><div class="fi-title">Live Analytics</div><div class="fi-sub">Real-time registrations & revenue</div></div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-icon">⚡</div>
+          <div><div class="fi-title">Instant Setup</div><div class="fi-sub">Event live in under 3 minutes</div></div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /hero-wrap -->
+</div><!-- /screen-landing -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 2: EVENT CREATION WIZARD
+══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-wizard">
+  <div class="wizard-wrap">
+    <!-- LEFT: form -->
+    <div class="wizard-left">
+      <div class="wiz-header">
+        <button class="wiz-back" onclick="showScreen('landing')">← Back</button>
+        <div class="wiz-title">Create New Event</div>
+        <div class="wiz-sub">Fill in the details to publish your event in minutes.</div>
+      </div>
+
+      <!-- stepper -->
+      <div class="stepper">
+        <div class="step-item active" id="step-item-1" onclick="goStep(1)">
+          <div class="step-num" id="step-num-1">1</div>
+        </div>
+        <div class="step-item" id="step-item-2" onclick="goStep(2)">
+          <div class="step-num" id="step-num-2">2</div>
+        </div>
+        <div class="step-item" id="step-item-3" onclick="goStep(3)">
+          <div class="step-num" id="step-num-3">3</div>
+        </div>
+        <div class="step-item" id="step-item-4" onclick="goStep(4)">
+          <div class="step-num" id="step-num-4">4</div>
+        </div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="step-content active" id="wiz-step-1">
+        <h3 style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.02em;">Basic Info</h3>
+        <p style="font-size:13px;color:var(--text3);margin-bottom:24px;">Give your event a name and description.</p>
+
+        <div class="form-group">
+          <div class="form-label">Event Name</div>
+          <input class="form-input" placeholder="e.g. HackSphere 2025" id="evt-name" oninput="updatePreview()">
+        </div>
+        <div class="form-group">
+          <div class="form-label">
+            Description
+            <button class="ai-btn" onclick="aiGenerateDesc()">✨ AI Generate</button>
+          </div>
+          <textarea class="form-input" placeholder="What's your event about?" id="evt-desc" oninput="updatePreview()"></textarea>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Category</div>
+          <select class="form-input" id="evt-cat" onchange="updatePreview()">
+            <option value="">Select category…</option>
+            <option>Hackathon</option>
+            <option>Workshop</option>
+            <option>Cultural Fest</option>
+            <option>Speaker Session</option>
+            <option>Sports</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Date & Time</div>
+          <input class="form-input" type="datetime-local" id="evt-date" oninput="updatePreview()">
+        </div>
+        <div class="wiz-footer">
+          <div></div>
+          <button class="wiz-next" onclick="goStep(2)">Rules Engine →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-content" id="wiz-step-2">
+        <h3 style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.02em;">Rules Engine 🔥</h3>
+        <p style="font-size:13px;color:var(--text3);margin-bottom:24px;">Define who can participate and how teams work.</p>
+
+        <div class="form-label" style="margin-bottom:10px">Active Rules</div>
+        <div class="rules-zone" id="rules-zone">
+          <div class="chip chip-indigo">👥 Team: 2–4 members <button class="chip-remove" onclick="removeChip(this)">×</button></div>
+          <div class="chip chip-teal">🎓 Year: 1–4 <button class="chip-remove" onclick="removeChip(this)">×</button></div>
+          <div class="chip chip-violet">📧 College Email Required <button class="chip-remove" onclick="removeChip(this)">×</button></div>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+          <button class="add-rule-btn" onclick="addRule('chip-indigo','👥 Team: 1–2 members')">+ Team Size</button>
+          <button class="add-rule-btn" onclick="addRule('chip-amber','📚 CGPA ≥ 7.0')">+ CGPA Filter</button>
+          <button class="add-rule-btn" onclick="addRule('chip-teal','🌍 Open to All')">+ Eligibility</button>
+          <button class="add-rule-btn" onclick="addRule('chip-violet','🔁 Rounds: 3')">+ Add Round</button>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">Max Participants</div>
+          <input class="form-input" type="number" placeholder="e.g. 200" id="evt-cap" oninput="updatePreview()">
+        </div>
+
+        <div class="wiz-footer">
+          <button class="wiz-prev" onclick="goStep(1)">← Back</button>
+          <button class="wiz-next" onclick="goStep(3)">Pricing →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-content" id="wiz-step-3">
+        <h3 style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.02em;">Pricing</h3>
+        <p style="font-size:13px;color:var(--text3);margin-bottom:24px;">Choose a pricing model for your event.</p>
+
+        <div class="pricing-seg" style="margin-bottom:20px">
+          <button class="seg-btn active" id="seg-free" onclick="setPricing('free')">Free</button>
+          <button class="seg-btn" id="seg-paid" onclick="setPricing('paid')">Paid</button>
+          <button class="seg-btn" id="seg-tiered" onclick="setPricing('tiered')">Tiered</button>
+        </div>
+
+        <div id="pricing-paid" style="display:none">
+          <div class="form-group">
+            <div class="form-label">Registration Fee (₹)</div>
+            <input class="form-input" type="number" placeholder="e.g. 199" id="evt-price" oninput="updatePreview()">
+          </div>
+        </div>
+        <div id="pricing-tiered" style="display:none">
+          <div class="form-group">
+            <div class="form-label">Early Bird Price (₹)</div>
+            <input class="form-input" type="number" placeholder="e.g. 99">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Regular Price (₹)</div>
+            <input class="form-input" type="number" placeholder="e.g. 199">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label" style="margin-bottom:10px">Coupon Code</div>
+          <div class="toggle-row">
+            <button class="toggle" id="coupon-toggle" onclick="this.classList.toggle('on')"></button>
+            <span class="toggle-label">Enable discount codes</span>
+          </div>
+        </div>
+
+        <div class="wiz-footer">
+          <button class="wiz-prev" onclick="goStep(2)">← Back</button>
+          <button class="wiz-next" onclick="goStep(4)">Preview →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step-content" id="wiz-step-4">
+        <h3 style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.02em;">Review & Publish</h3>
+        <p style="font-size:13px;color:var(--text3);margin-bottom:24px;">Everything looks good? Go live.</p>
+
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;margin-bottom:24px;">
+          <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px;">Your event link will be:</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border:1.5px solid var(--indigo-mid);border-radius:var(--r-sm);">
+            <span style="font-family:var(--mono);font-size:13px;color:var(--indigo);flex:1" id="evt-link">eventflex.app/e/my-event</span>
+            <button style="font-size:12px;font-weight:600;color:var(--text3);background:none;border:none;cursor:pointer;">Copy</button>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;" id="review-checklist">
+          <div class="check-row" style="display:flex;align-items:center;gap:10px;font-size:13px;">
+            <span style="color:#16A34A">✓</span> <span style="color:var(--text2)">Event name set</span>
+          </div>
+          <div class="check-row" style="display:flex;align-items:center;gap:10px;font-size:13px;">
+            <span style="color:#16A34A">✓</span> <span style="color:var(--text2)">3 rules configured</span>
+          </div>
+          <div class="check-row" style="display:flex;align-items:center;gap:10px;font-size:13px;">
+            <span style="color:#16A34A">✓</span> <span style="color:var(--text2)">Pricing set to Free</span>
+          </div>
+          <div class="check-row" style="display:flex;align-items:center;gap:10px;font-size:13px;">
+            <span style="color:#D97706">◐</span> <span style="color:var(--text2)">Description (optional — add later)</span>
+          </div>
+        </div>
+
+        <div class="wiz-footer" style="border-top:none;padding-top:0;margin-top:0;">
+          <button class="wiz-prev" onclick="goStep(3)">← Back</button>
+          <button class="wiz-next" onclick="publishEvent()" style="padding:12px 28px;font-size:15px;gap:10px;">
+            🚀 Publish &amp; Get Link
+          </button>
+        </div>
+      </div>
+    </div><!-- /wizard-left -->
+
+    <!-- RIGHT: live preview -->
+    <div class="wizard-right">
+      <div class="preview-box">
+        <div class="preview-label">Live Preview</div>
+        <div class="preview-card">
+          <div class="preview-banner">
+            <div class="preview-banner-pattern"></div>
+            <div style="position:relative;z-index:2;text-align:center;color:rgba(255,255,255,0.7);font-size:13px;">Banner Image</div>
+          </div>
+          <div class="preview-body">
+            <div class="preview-event-name" id="prev-name">HackSphere 2025</div>
+            <div class="preview-event-desc" id="prev-desc">Fill in the details on the left to see your event come alive here in real time.</div>
+            <div class="preview-chips" id="prev-chips">
+              <div class="chip chip-indigo" style="font-size:11px;padding:4px 10px;">Hackathon</div>
+              <div class="chip chip-teal" style="font-size:11px;padding:4px 10px;">Team: 2–4</div>
+              <div class="chip chip-violet" style="font-size:11px;padding:4px 10px;">3 Rounds</div>
+            </div>
+            <div class="preview-price-row">
+              <div>
+                <div class="preview-price" id="prev-price">Free <span>entry</span></div>
+              </div>
+              <button class="preview-reg-btn">Register Now →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ai suggestions box -->
+        <div style="margin-top:16px;background:var(--surface);border:1px solid var(--indigo-mid);border-radius:var(--r-lg);padding:16px;" id="ai-suggest-box" style="display:none">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="font-size:16px">🤖</span>
+            <span style="font-size:12px;font-weight:700;color:var(--indigo)">AI Co-Pilot Suggestion</span>
+          </div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7;" id="ai-suggest-text">
+            Based on "Hackathon" category, consider adding a CGPA filter (≥ 7.0) and requiring a GitHub profile link in registration form.
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button style="flex:1;padding:7px;border-radius:var(--r-sm);background:var(--indigo-soft);border:1px solid var(--indigo-mid);font-size:12px;font-weight:600;color:var(--indigo);cursor:pointer;">Apply</button>
+            <button style="flex:1;padding:7px;border-radius:var(--r-sm);background:none;border:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;">Dismiss</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /wizard-right -->
+  </div><!-- /wizard-wrap -->
+</div><!-- /screen-wizard -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 3: ADMIN DASHBOARD
+══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-admin-dashboard">
+  <div class="dash-wrap">
+    <div class="dash-header">
+      <div class="dash-title-row">
+        <div class="dash-greeting">Good afternoon, Priya 👋</div>
+        <div class="dash-h1">HackSphere 2025</div>
+      </div>
+      <div class="dash-actions">
+        <button class="filter-btn">📅 Last 30 days ▾</button>
+        <button class="export-btn" onclick="showExportToast()">⬇ Export CSV</button>
+        <button class="btn-primary" onclick="showScreen('wizard')">+ New Event</button>
+      </div>
+    </div>
+
+    <!-- KPI cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon">👥</div>
+        <div class="kpi-val">847</div>
+        <div class="kpi-label">Total Registrations</div>
+        <div class="kpi-change"><span class="kpi-up">↑ 18%</span> vs last event</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-val">₹1.22L</div>
+        <div class="kpi-label">Total Revenue</div>
+        <div class="kpi-change"><span class="kpi-up">↑ 34%</span> vs last event</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">⚡</div>
+        <div class="kpi-val">74.2%</div>
+        <div class="kpi-label">Conversion Rate</div>
+        <div class="kpi-change"><span class="kpi-down">↓ 2.1%</span> vs last event</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">📍</div>
+        <div class="kpi-val">612</div>
+        <div class="kpi-label">Active Participants</div>
+        <div class="kpi-change"><span class="kpi-up">↑ 9%</span> this week</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="cc-header">
+          <div>
+            <div class="cc-title">Registrations Over Time</div>
+            <div class="cc-sub">847 total registrations</div>
+          </div>
+          <div class="cc-period">
+            <button class="period-btn" onclick="setPeriod(this)">7D</button>
+            <button class="period-btn active" onclick="setPeriod(this)">30D</button>
+            <button class="period-btn" onclick="setPeriod(this)">90D</button>
+          </div>
+        </div>
+        <svg class="svg-chart" viewBox="0 0 560 160" preserveAspectRatio="none" id="main-chart">
+          <defs>
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#6366F1" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#6366F1" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#6366F1"/>
+              <stop offset="100%" stop-color="#8B5CF6"/>
+            </linearGradient>
+          </defs>
+          <!-- area fill -->
+          <path class="chart-area" d="M0,140 L0,110 C28,100 56,95 84,85 C112,75 140,92 168,80 C196,68 224,40 252,35 C280,30 308,50 336,42 C364,34 392,20 420,15 C448,10 476,18 504,12 C532,6 560,8 560,8 L560,140 Z"/>
+          <!-- line -->
+          <path class="chart-line" d="M0,110 C28,100 56,95 84,85 C112,75 140,92 168,80 C196,68 224,40 252,35 C280,30 308,50 336,42 C364,34 392,20 420,15 C448,10 476,18 504,12 C532,6 560,8 560,8"/>
+          <!-- dots -->
+          <circle class="chart-dot" cx="84" cy="85" r="4"/>
+          <circle class="chart-dot" cx="252" cy="35" r="4"/>
+          <circle class="chart-dot" cx="420" cy="15" r="5" style="fill:var(--indigo);stroke:#fff;stroke-width:2"/>
+          <circle class="chart-dot" cx="560" cy="8" r="4"/>
+          <!-- x labels -->
+          <text x="0" y="158" font-size="10" fill="#A8A89E" font-family="Plus Jakarta Sans">Mar 1</text>
+          <text x="100" y="158" font-size="10" fill="#A8A89E" font-family="Plus Jakarta Sans">Mar 8</text>
+          <text x="220" y="158" font-size="10" fill="#A8A89E" font-family="Plus Jakarta Sans">Mar 15</text>
+          <text x="340" y="158" font-size="10" fill="#A8A89E" font-family="Plus Jakarta Sans">Mar 22</text>
+          <text x="480" y="158" font-size="10" fill="#A8A89E" font-family="Plus Jakarta Sans">Mar 30</text>
+        </svg>
+      </div>
+
+      <div class="chart-card">
+        <div class="cc-header">
+          <div>
+            <div class="cc-title">Registration Sources</div>
+            <div class="cc-sub">By channel</div>
+          </div>
+        </div>
+        <div class="donut-wrap">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#F0F0EB" stroke-width="18"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="url(#lineGrad)" stroke-width="18"
+              stroke-dasharray="289" stroke-dashoffset="72" stroke-linecap="round"
+              transform="rotate(-90 60 60)"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#22D3EE" stroke-width="18"
+              stroke-dasharray="289" stroke-dashoffset="200" stroke-linecap="round"
+              transform="rotate(130 60 60)"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#F59E0B" stroke-width="18"
+              stroke-dasharray="289" stroke-dashoffset="245" stroke-linecap="round"
+              transform="rotate(215 60 60)"/>
+            <text x="60" y="56" text-anchor="middle" font-size="18" font-weight="800" fill="#111110" font-family="Plus Jakarta Sans">847</text>
+            <text x="60" y="70" text-anchor="middle" font-size="9" fill="#A8A89E" font-family="Plus Jakarta Sans">total</text>
+          </svg>
+          <div class="donut-legend">
+            <div class="leg-item"><div style="display:flex;align-items:center"><div class="leg-dot" style="background:var(--indigo)"></div><span class="leg-name">Direct Link</span></div><span class="leg-val">52%</span></div>
+            <div class="leg-item"><div style="display:flex;align-items:center"><div class="leg-dot" style="background:#22D3EE"></div><span class="leg-name">WhatsApp</span></div><span class="leg-val">29%</span></div>
+            <div class="leg-item"><div style="display:flex;align-items:center"><div class="leg-dot" style="background:#F59E0B"></div><span class="leg-name">Instagram</span></div><span class="leg-val">19%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Participant Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">Participants</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="table-search">
+            <span>🔍</span>
+            <input placeholder="Search name, email…">
+          </div>
+          <button class="filter-btn">Status ▾</button>
+        </div>
+      </div>
+      <table class="ptable">
+        <thead>
+          <tr>
+            <th>Participant</th>
+            <th>College</th>
+            <th>Team</th>
+            <th>Status</th>
+            <th>Payment</th>
+            <th>Registered</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="td-name-wrap"><div class="td-avatar" style="background:linear-gradient(135deg,#6366F1,#8B5CF6)">AR</div><div><div class="td-name">Arjun Rao</div><div class="td-email">arjun@iitb.ac.in</div></div></div></td>
+            <td style="color:var(--text2)">IIT Bombay</td>
+            <td><span class="chip chip-indigo" style="font-size:11px;padding:3px 8px;">Team Nexus</span></td>
+            <td><span class="status-pill s-confirmed"><span class="s-dot"></span>Confirmed</span></td>
+            <td style="font-weight:600;color:var(--text)">₹299</td>
+            <td style="color:var(--text3);font-size:12px;">Mar 18, 2025</td>
+          </tr>
+          <tr>
+            <td><div class="td-name-wrap"><div class="td-avatar" style="background:linear-gradient(135deg,#EC4899,#F97316)">PS</div><div><div class="td-name">Priya Sharma</div><div class="td-email">priya@bits.edu</div></div></div></td>
+            <td style="color:var(--text2)">BITS Pilani</td>
+            <td><span class="chip chip-teal" style="font-size:11px;padding:3px 8px;">Solo</span></td>
+            <td><span class="status-pill s-confirmed"><span class="s-dot"></span>Confirmed</span></td>
+            <td style="font-weight:600;color:var(--text)">₹299</td>
+            <td style="color:var(--text3);font-size:12px;">Mar 19, 2025</td>
+          </tr>
+          <tr>
+            <td><div class="td-name-wrap"><div class="td-avatar" style="background:linear-gradient(135deg,#14B8A6,#06B6D4)">RV</div><div><div class="td-name">Rohan Verma</div><div class="td-email">rohan@nit.ac.in</div></div></div></td>
+            <td style="color:var(--text2)">NIT Surathkal</td>
+            <td><span class="chip chip-indigo" style="font-size:11px;padding:3px 8px;">Team Nexus</span></td>
+            <td><span class="status-pill s-pending"><span class="s-dot"></span>Pending</span></td>
+            <td style="font-weight:600;color:var(--text)">—</td>
+            <td style="color:var(--text3);font-size:12px;">Mar 20, 2025</td>
+          </tr>
+          <tr>
+            <td><div class="td-name-wrap"><div class="td-avatar" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">SK</div><div><div class="td-name">Shreya Kulkarni</div><div class="td-email">shreya@vit.ac.in</div></div></div></td>
+            <td style="color:var(--text2)">VIT Vellore</td>
+            <td><span class="chip chip-violet" style="font-size:11px;padding:3px 8px;">Team Alpha</span></td>
+            <td><span class="status-pill s-confirmed"><span class="s-dot"></span>Confirmed</span></td>
+            <td style="font-weight:600;color:var(--text)">₹299</td>
+            <td style="color:var(--text3);font-size:12px;">Mar 21, 2025</td>
+          </tr>
+          <tr>
+            <td><div class="td-name-wrap"><div class="td-avatar" style="background:linear-gradient(135deg,#8B5CF6,#6366F1)">AK</div><div><div class="td-name">Aditya Kumar</div><div class="td-email">aditya@iitd.ac.in</div></div></div></td>
+            <td style="color:var(--text2)">IIT Delhi</td>
+            <td><span class="chip chip-amber" style="font-size:11px;padding:3px 8px;">Team Alpha</span></td>
+            <td><span class="status-pill s-cancelled"><span class="s-dot"></span>Cancelled</span></td>
+            <td style="font-weight:600;color:var(--text)">Refunded</td>
+            <td style="color:var(--text3);font-size:12px;">Mar 22, 2025</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="padding:14px 22px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:12px;color:var(--text3)">Showing 5 of 847 participants</span>
+        <div style="display:flex;gap:4px;">
+          <button style="padding:5px 10px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:none;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;">← Prev</button>
+          <button style="padding:5px 10px;border-radius:var(--r-sm);border:none;background:var(--grad);font-size:12px;font-weight:600;color:#fff;cursor:pointer;">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /dash-wrap -->
+</div><!-- /screen-admin -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 4: PARTICIPANT DASHBOARD
+══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-participant">
+  <div class="part-wrap">
+    <div class="part-header">
+      <div class="part-avatar">AR</div>
+      <div>
+        <div class="part-name">Arjun Rao</div>
+        <div class="part-meta">arjun@iitb.ac.in · IIT Bombay · 3rd Year, CSE</div>
+      </div>
+      <div class="part-stats">
+        <div class="ps-item">
+          <div class="ps-val">4</div>
+          <div class="ps-lbl">Events</div>
+        </div>
+        <div class="ps-item">
+          <div class="ps-val">2</div>
+          <div class="ps-lbl">Teams</div>
+        </div>
+        <div class="ps-item">
+          <div class="ps-val" style="color:var(--indigo)">₹598</div>
+          <div class="ps-lbl">Spent</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head">My Registered Events</div>
+    <div class="events-grid">
+      <!-- card 1 -->
+      <div class="event-card">
+        <div class="ec-banner" style="background:linear-gradient(135deg,#6366F1,#8B5CF6)">
+          <div class="ec-status-badge s-confirmed" style="background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.3);">✅ Registered</div>
+        </div>
+        <div class="ec-body">
+          <div class="ec-cat">Hackathon</div>
+          <div class="ec-name">HackSphere 2025</div>
+          <div class="ec-date">📅 April 12–13, 2025 · Online</div>
+          <div class="ec-actions">
+            <button class="ec-btn" onclick="alert('Joining WhatsApp Group…')">💬 WhatsApp</button>
+            <button class="ec-btn" onclick="showScreen('public-event')">🔗 View Rules</button>
+            <button class="ec-btn ec-btn-primary">🎟️ Ticket</button>
+          </div>
+        </div>
+      </div>
+      <!-- card 2 -->
+      <div class="event-card">
+        <div class="ec-banner" style="background:linear-gradient(135deg,#14B8A6,#22D3EE)">
+          <div class="ec-status-badge" style="background:rgba(251,191,36,0.2);color:#FDE68A;border:1px solid rgba(251,191,36,0.3);">⏳ Pending</div>
+        </div>
+        <div class="ec-body">
+          <div class="ec-cat">Workshop</div>
+          <div class="ec-name">DevSprint: React Masterclass</div>
+          <div class="ec-date">📅 April 5, 2025 · Offline · IITB</div>
+          <div class="ec-actions">
+            <button class="ec-btn">💳 Pay ₹199</button>
+            <button class="ec-btn" onclick="showScreen('public-event')">📋 Details</button>
+          </div>
+        </div>
+      </div>
+      <!-- card 3 -->
+      <div class="event-card">
+        <div class="ec-banner" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">
+          <div class="ec-status-badge s-confirmed" style="background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.3);">✅ Registered</div>
+        </div>
+        <div class="ec-body">
+          <div class="ec-cat">Speaker Session</div>
+          <div class="ec-name">Founders Friday Vol. 3</div>
+          <div class="ec-date">📅 March 29, 2025 · Online</div>
+          <div class="ec-actions">
+            <button class="ec-btn">🔔 Reminder</button>
+            <button class="ec-btn ec-btn-primary">🎟️ Ticket</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head">Activity Timeline</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot done">✅</div>
+        <div class="tl-content">
+          <div class="tl-event">Registered for <strong>HackSphere 2025</strong></div>
+          <div class="tl-time">Mar 18, 2025 · ₹299 paid · Team Nexus</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot done">💳</div>
+        <div class="tl-content">
+          <div class="tl-event">Payment confirmed for <strong>HackSphere 2025</strong></div>
+          <div class="tl-time">Mar 18, 2025 · Razorpay · Order #rz_28xxxx</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">⏳</div>
+        <div class="tl-content">
+          <div class="tl-event">Registered for <strong>DevSprint Workshop</strong> — payment pending</div>
+          <div class="tl-time">Mar 20, 2025 · ₹199 due</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot done">✅</div>
+        <div class="tl-content">
+          <div class="tl-event">Registered for <strong>Founders Friday Vol. 3</strong></div>
+          <div class="tl-time">Mar 22, 2025 · Free event</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /screen-participant -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 5: PUBLIC EVENT PAGE
+══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-public-event">
+  <div class="public-wrap">
+    <div class="pub-banner">
+      <div class="preview-banner-pattern" style="opacity:0.2"></div>
+      <div class="pub-banner-text">
+        <div style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.7;margin-bottom:8px;font-weight:600;">Hackathon · IIT Bombay</div>
+        <div class="pub-banner-title">HackSphere 2025</div>
+        <div class="pub-banner-sub">48 hours. One problem. Unlimited possibilities.</div>
+      </div>
+    </div>
+
+    <div class="pub-body">
+      <div class="pub-left">
+        <div class="pub-section">
+          <div class="pub-section-title" style="cursor:default;">About the Event</div>
+          <p class="pub-desc">HackSphere is IIT Bombay's flagship student hackathon — 48 hours of building, learning, and connecting with the brightest minds across India. Whether you're a coder, designer, or product thinker, this is your arena. Bring your team, bring your ideas, and let's build something remarkable.</p>
+          <p class="pub-desc">Top 3 teams win cash prizes, internship opportunities, and mentorship from leading startup founders.</p>
+        </div>
+
+        <div class="pub-section">
+          <div class="pub-section-title">Eligibility & Rules</div>
+          <div class="rules-list">
+            <div class="rule-item">
+              <span class="rule-icon">👥</span>
+              <div class="rule-text"><strong>Team Size:</strong> 2 to 4 members per team</div>
+            </div>
+            <div class="rule-item">
+              <span class="rule-icon">🎓</span>
+              <div class="rule-text"><strong>Eligibility:</strong> Open to students from any college. Year 1–4.</div>
+            </div>
+            <div class="rule-item">
+              <span class="rule-icon">📧</span>
+              <div class="rule-text"><strong>Verification:</strong> Valid college email ID required for registration</div>
+            </div>
+            <div class="rule-item">
+              <span class="rule-icon">🏆</span>
+              <div class="rule-text"><strong>Rounds:</strong> Round 1 — Submission · Round 2 — Shortlist Demo · Round 3 — Finals</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pub-section">
+          <div class="pub-section-title">Prizes</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center;">
+              <div style="font-size:24px;margin-bottom:6px;">🥇</div>
+              <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.03em;">₹50,000</div>
+              <div style="font-size:11px;color:var(--text3);font-weight:500;margin-top:2px;">First Place</div>
+            </div>
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center;">
+              <div style="font-size:24px;margin-bottom:6px;">🥈</div>
+              <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.03em;">₹25,000</div>
+              <div style="font-size:11px;color:var(--text3);font-weight:500;margin-top:2px;">Second Place</div>
+            </div>
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center;">
+              <div style="font-size:24px;margin-bottom:6px;">🥉</div>
+              <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.03em;">₹10,000</div>
+              <div style="font-size:11px;color:var(--text3);font-weight:500;margin-top:2px;">Third Place</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /pub-left -->
+
+      <div>
+        <div class="pub-reg-card">
+          <div class="pub-reg-price"><sup>₹</sup>299</div>
+          <div class="pub-reg-tier">⏰ Early Bird ends Mar 31</div>
+          <button class="pub-reg-btn" onclick="showScreen('wizard')">Register Now →</button>
+          <div class="pub-trust">
+            <span>🔥</span>
+            <span><strong>127 students</strong> registered today</span>
+          </div>
+          <div class="pub-details">
+            <div class="pub-detail">
+              <span class="pd-icon">📅</span>
+              <span class="pd-label">Date</span>
+              <span class="pd-val">Apr 12–13, 2025</span>
+            </div>
+            <div class="pub-detail">
+              <span class="pd-icon">📍</span>
+              <span class="pd-label">Venue</span>
+              <span class="pd-val">Online + IIT Bombay</span>
+            </div>
+            <div class="pub-detail">
+              <span class="pd-icon">👥</span>
+              <span class="pd-label">Capacity</span>
+              <span class="pd-val">200 teams (800 slots)</span>
+            </div>
+            <div class="pub-detail">
+              <span class="pd-icon">⏱️</span>
+              <span class="pd-label">Duration</span>
+              <span class="pd-val">48 Hours</span>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:8px;">
+            <button style="flex:1;padding:8px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:none;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;" onclick="alert('Link copied!')">📋 Copy Link</button>
+            <button style="flex:1;padding:8px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:none;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;" onclick="alert('Added to calendar!')">📅 Add to Cal</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /screen-public -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 6: AI CO-PILOT
+══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-ai-copilot">
+  <div class="ai-wrap">
+    <div class="ai-context">
+      <div style="display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:20px;background:var(--indigo-soft);border:1px solid var(--indigo-mid);font-size:12px;font-weight:600;color:var(--indigo);margin-bottom:20px;">
+        <span class="hero-eyebrow-dot"></span> Powered by Claude
+      </div>
+      <div class="ai-context-title">AI Co-Pilot</div>
+      <p class="ai-context-sub">Your intelligent assistant for event creation. Generate descriptions, detect rule conflicts, suggest pricing, and build event templates — all in natural language.</p>
+
+      <div class="ai-feature-grid">
+        <div class="aif-card" onclick="loadChat('desc')">
+          <div class="aif-icon">✍️</div>
+          <div class="aif-title">Generate Description</div>
+          <div class="aif-desc">Turn a few keywords into a compelling event description that gets registrations.</div>
+        </div>
+        <div class="aif-card" onclick="loadChat('rules')">
+          <div class="aif-icon">⚙️</div>
+          <div class="aif-title">Build Rule Templates</div>
+          <div class="aif-desc">Get pre-built eligibility rules for hackathons, workshops, cultural events & more.</div>
+        </div>
+        <div class="aif-card" onclick="loadChat('pricing')">
+          <div class="aif-icon">💰</div>
+          <div class="aif-title">Pricing Strategy</div>
+          <div class="aif-desc">Get data-backed pricing recommendations based on your event type and goals.</div>
+        </div>
+        <div class="aif-card" onclick="loadChat('conflict')">
+          <div class="aif-icon">⚠️</div>
+          <div class="aif-title">Conflict Detection</div>
+          <div class="aif-desc">Paste your rules and I'll find contradictions before your event goes live.</div>
+        </div>
+      </div>
+
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;">Quick Actions</div>
+      <div class="quick-actions">
+        <button class="qa-chip" onclick="sendQuick('Generate hackathon rules for 200 students')">⚙️ Generate hackathon rules</button>
+        <button class="qa-chip" onclick="sendQuick('Suggest pricing for a 2-day online hackathon')">💰 Suggest pricing</button>
+        <button class="qa-chip" onclick="sendQuick('Write event description for a UI/UX workshop')">✍️ Write description</button>
+        <button class="qa-chip" onclick="sendQuick('Detect conflicts in my rules')">⚠️ Check rule conflicts</button>
+        <button class="qa-chip" onclick="sendQuick('Create a workshop template for 50 students')">📋 Workshop template</button>
+      </div>
+    </div><!-- /ai-context -->
+
+    <!-- chat panel -->
+    <div class="ai-panel">
+      <div class="ai-panel-head">
+        <div class="ai-avatar">🤖</div>
+        <div>
+          <div class="ai-name">EventFlex AI</div>
+          <div class="ai-status"><span class="ai-status-dot"></span> Ready to help</div>
+        </div>
+      </div>
+      <div class="chat-msgs" id="chat-msgs">
+        <div class="msg msg-ai">
+          <div class="msg-avatar">EF</div>
+          <div>
+            <div class="msg-bubble">
+              Hey! I'm your EventFlex AI Co-Pilot. I can help you generate event descriptions, build rule templates, suggest pricing, and detect conflicts. What are you working on today?
+            </div>
+            <div class="msg-time">Just now</div>
+          </div>
+        </div>
+        <div class="msg msg-user">
+          <div class="msg-avatar">👤</div>
+          <div>
+            <div class="msg-bubble">Generate hackathon rules for 200 students</div>
+            <div class="msg-time">Just now</div>
+          </div>
+        </div>
+        <div class="msg msg-ai">
+          <div class="msg-avatar">EF</div>
+          <div>
+            <div class="msg-bubble">
+              Here's a recommended rule set for a 200-student hackathon:
+              <div class="ai-suggestion">
+                <div class="ai-suggestion-title">✦ Rule Template: Standard Hackathon</div>
+                🔹 <strong>Team Size:</strong> 2–4 members<br>
+                🔹 <strong>Eligibility:</strong> All engineering students, Year 1–4<br>
+                🔹 <strong>Verification:</strong> College email required<br>
+                🔹 <strong>Rounds:</strong> Round 1 (Submission) → Round 2 (Demo) → Finals<br>
+                🔹 <strong>Capacity:</strong> 50 teams maximum<br>
+                🔹 <strong>Submission:</strong> GitHub repo + 2-min demo video<br>
+                <br>
+                <em>⚠️ No CGPA filter — maximizes participation for 200-person target.</em>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:6px;margin-left:38px;">
+              <button style="padding:5px 12px;border-radius:20px;background:var(--indigo-soft);border:1px solid var(--indigo-mid);font-size:11px;font-weight:600;color:var(--indigo);cursor:pointer;" onclick="showScreen('wizard')">Apply to Event →</button>
+              <button style="padding:5px 12px;border-radius:20px;background:var(--bg);border:1px solid var(--border);font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;">Regenerate</button>
+            </div>
+            <div class="msg-time">Just now</div>
+          </div>
+        </div>
+      </div><!-- /chat-msgs -->
+      <div class="chat-input-wrap">
+        <textarea class="chat-input" id="chat-input" placeholder="Ask AI anything about your event…" rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"></textarea>
+        <button class="chat-send" onclick="sendMsg()">→</button>
+      </div>
+    </div><!-- /ai-panel -->
+  </div>
+</div><!-- /screen-ai -->
+
+</div><!-- /main -->
+
+<!-- toast -->
+<div id="toast" style="
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--text);color:#fff;padding:12px 24px;border-radius:var(--r);
+  font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);
+  transition:transform 0.3s var(--ease);z-index:9999;
+  display:flex;align-items:center;gap:8px;white-space:nowrap;
+">
+  <span id="toast-icon">✓</span>
+  <span id="toast-msg">Done!</span>
+</div>
+
+<script>
+/* ── screen switching ─────────────────────────────── */
+const screens={
+  'landing':'screen-landing',
+  'wizard':'screen-wizard',
+  'admin-dashboard':'screen-admin-dashboard',
+  'participant':'screen-participant',
+  'public-event':'screen-public-event',
+  'ai-copilot':'screen-ai-copilot',
+};
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const sc=document.getElementById(screens[id]);
+  if(sc){sc.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+}
+
+/* ── wizard stepper ───────────────────────────────── */
+let currentStep=1;
+function goStep(n){
+  // mark completed
+  for(let i=1;i<=4;i++){
+    const item=document.getElementById('step-item-'+i);
+    const num=document.getElementById('step-num-'+i);
+    item.classList.remove('active','completed');
+    if(i<n){item.classList.add('completed');num.innerHTML='✓';}
+    else if(i===n){item.classList.add('active');}
+    else{num.textContent=i;}
+  }
+  document.querySelectorAll('.step-content').forEach(s=>s.classList.remove('active'));
+  document.getElementById('wiz-step-'+n).classList.add('active');
+  currentStep=n;
+
+  // show AI suggestion on step 1 after a moment
+  if(n===1){
+    setTimeout(()=>{
+      const box=document.getElementById('ai-suggest-box');
+      if(box) box.style.display='block';
+    },800);
+  }
+}
+
+/* ── rules chip ───────────────────────────────────── */
+function addRule(cls,label){
+  const zone=document.getElementById('rules-zone');
+  const chip=document.createElement('div');
+  chip.className='chip '+cls;
+  chip.innerHTML=label+' <button class="chip-remove" onclick="removeChip(this)">×</button>';
+  zone.appendChild(chip);
+  updatePreviewChips();
+  toast('✓','Rule added');
+}
+function removeChip(btn){
+  btn.parentElement.remove();
+  updatePreviewChips();
+}
+
+/* ── pricing segment ──────────────────────────────── */
+function setPricing(type){
+  ['free','paid','tiered'].forEach(t=>{
+    document.getElementById('seg-'+t).classList.toggle('active',t===type);
+    const el=document.getElementById('pricing-'+t);
+    if(el) el.style.display=(t===type&&t!=='free')?'block':'none';
+  });
+  document.getElementById('prev-price').innerHTML=
+    type==='free'?'Free <span>entry</span>':
+    type==='paid'?'₹<span style="font-size:14px">—</span>':
+    '₹99 <span>early bird</span>';
+}
+
+/* ── live preview ─────────────────────────────────── */
+function updatePreview(){
+  const name=document.getElementById('evt-name').value||'Your Event Name';
+  const desc=document.getElementById('evt-desc').value||'Fill in the details on the left to see your event come alive here in real time.';
+  document.getElementById('prev-name').textContent=name;
+  document.getElementById('prev-desc').textContent=desc;
+  // update slug
+  const slug=name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')||'my-event';
+  const linkEl=document.getElementById('evt-link');
+  if(linkEl) linkEl.textContent='eventflex.app/e/'+slug;
+}
+function updatePreviewChips(){
+  const chips=document.querySelectorAll('#rules-zone .chip');
+  const prev=document.getElementById('prev-chips');
+  prev.innerHTML='';
+  chips.forEach((c,i)=>{
+    if(i>2) return;
+    const mini=document.createElement('div');
+    const cls=c.className.replace('chip ','').replace(/<.*>/g,'').split(' ')[0];
+    mini.className='chip chip-indigo';
+    mini.style.cssText='font-size:11px;padding:4px 10px;';
+    mini.textContent=c.textContent.replace('×','').trim();
+    prev.appendChild(mini);
+  });
+}
+
+/* ── ai desc generate ─────────────────────────────── */
+function aiGenerateDesc(){
+  const name=document.getElementById('evt-name').value||'this event';
+  const desc=document.getElementById('evt-desc');
+  desc.value='';
+  desc.placeholder='Generating with AI…';
+  const sample=`${name} is a 48-hour innovation marathon where student developers, designers, and product thinkers converge to solve real-world problems. Build fast, pitch bold, and compete for ₹85,000 in prizes and mentorship from top startup founders. Open to all engineering students — form your team and join the movement.`;
+  let i=0;
+  const t=setInterval(()=>{
+    desc.value=sample.slice(0,++i);
+    if(i>=sample.length){clearInterval(t);desc.placeholder='What\'s your event about?';}
+  },18);
+  toast('✨','Generating with AI…');
+  updatePreview();
+}
+
+/* ── publish ──────────────────────────────────────── */
+function publishEvent(){
+  toast('🚀','Event published! Redirecting…');
+  setTimeout(()=>showScreen('public-event'),1500);
+}
+
+/* ── ai chat ──────────────────────────────────────── */
+const aiResponses={
+  'desc':"I'll help you write a compelling description! Tell me the event name and key highlights, and I'll generate one in seconds. ✍️",
+  'rules':"Let me build a rule template for you. What type of event is it? (Hackathon / Workshop / Cultural / Open Speaker Session)",
+  'pricing':"Great! Share your event type, expected headcount, and venue (online/offline) — I'll suggest 3 pricing strategies with rationale.",
+  'conflict':"Paste your rules below (or describe them) and I'll analyze for contradictions, impossible conditions, and zero-match edge cases. ⚠️",
+  'default':"I'm on it! Let me think about the best approach for your event… Give me a moment."
+};
+function loadChat(type){
+  const msgs=document.getElementById('chat-msgs');
+  const msg=document.createElement('div');
+  msg.className='msg msg-ai';
+  msg.innerHTML=`<div class="msg-avatar">EF</div><div><div class="msg-bubble">${aiResponses[type]||aiResponses.default}</div><div class="msg-time">Just now</div></div>`;
+  msgs.appendChild(msg);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function sendQuick(text){
+  document.getElementById('chat-input').value=text;
+  sendMsg();
+}
+function sendMsg(){
+  const input=document.getElementById('chat-input');
+  const val=input.value.trim();
+  if(!val) return;
+  const msgs=document.getElementById('chat-msgs');
+
+  // user bubble
+  const um=document.createElement('div');
+  um.className='msg msg-user';
+  um.innerHTML=`<div class="msg-avatar">👤</div><div><div class="msg-bubble">${escHtml(val)}</div><div class="msg-time">Just now</div></div>`;
+  msgs.appendChild(um);
+
+  // typing indicator
+  const ti=document.createElement('div');
+  ti.className='msg msg-ai';
+  ti.innerHTML=`<div class="msg-avatar">EF</div><div class="msg-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+  msgs.appendChild(ti);
+  msgs.scrollTop=msgs.scrollHeight;
+  input.value='';
+
+  setTimeout(()=>{
+    ti.remove();
+    const resp=getAIResponse(val);
+    const am=document.createElement('div');
+    am.className='msg msg-ai';
+    am.innerHTML=`<div class="msg-avatar">EF</div><div><div class="msg-bubble">${resp}</div><div class="msg-time">Just now</div></div>`;
+    msgs.appendChild(am);
+    msgs.scrollTop=msgs.scrollHeight;
+  },1400);
+}
+function getAIResponse(q){
+  q=q.toLowerCase();
+  if(q.includes('hackathon')&&q.includes('rule'))
+    return 'Here are optimized rules for a hackathon: <div class="ai-suggestion"><div class="ai-suggestion-title">✦ Hackathon Rules Template</div>👥 Team: 2–4 · 🎓 Year: 1–4 · 📧 College email required · 🏆 3 Rounds · ⏱️ 48 hours · 💻 GitHub required</div>';
+  if(q.includes('pric'))
+    return 'Based on typical student hackathons: <div class="ai-suggestion"><div class="ai-suggestion-title">✦ Pricing Recommendations</div>🆓 <strong>Free</strong> — Max reach, sponsor-funded<br>💰 <strong>₹199 flat</strong> — Low barrier, covers ops<br>⏰ <strong>₹99 early bird → ₹249</strong> — Creates urgency, best conversion</div>';
+  if(q.includes('description')||q.includes('write'))
+    return 'I\'d love to! Share your: 1) event name, 2) category, 3) key highlights. I\'ll craft a 150-word description that maximizes registrations. ✍️';
+  if(q.includes('conflict')||q.includes('detect'))
+    return '<div class="ai-suggestion"><div class="ai-suggestion-title">⚠️ No conflicts detected</div>Your current rules are compatible. All conditions can be satisfied simultaneously. <br><br>Tip: Adding a CGPA filter with Year 1 eligibility could create a low-participation scenario.</div>';
+  if(q.includes('workshop'))
+    return '<div class="ai-suggestion"><div class="ai-suggestion-title">✦ Workshop Template</div>👤 Solo registration · 🌍 Open eligibility · 💺 Capped at 50 · 📝 Pre-survey form · 📅 Calendar sync auto-enabled</div>';
+  return "Great question! I'm analyzing your event context to give the best suggestion. Could you share more details about your target audience and goals? 🎯";
+}
+function escHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ── period buttons ───────────────────────────────── */
+function setPeriod(btn){
+  btn.closest('.cc-period').querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ── toast ────────────────────────────────────────── */
+function toast(icon,msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-icon').textContent=icon;
+  document.getElementById('toast-msg').textContent=msg;
+  t.style.transform='translateX(-50%) translateY(0)';
+  setTimeout(()=>t.style.transform='translateX(-50%) translateY(80px)',2400);
+}
+function showExportToast(){toast('⬇','CSV exported successfully!');}
+
+/* ── init ─────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('ai-suggest-box').style.display='none';
+  // auto-show suggestion after wizard loads
+  document.getElementById('screen-wizard').addEventListener('transitionend',()=>{
+    setTimeout(()=>{document.getElementById('ai-suggest-box').style.display='block';},1000);
+  });
+});
+</script>
+</body>
+</html>
